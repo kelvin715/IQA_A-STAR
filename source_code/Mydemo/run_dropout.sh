@@ -12,22 +12,15 @@ run_yolo() {
 
 # 创建一个数组，包含所有的数据文件路径和名称
 declare -a tasks=(
-"/Data4/student_zhihan_data/data/GC10-DET_brightness_-100/data.yaml GC10-DET_brightness_-100_detect_by_yolov8n_with_dropout(p=0.1)"
-"/Data4/student_zhihan_data/data/GC10-DET_brightness_-50/data.yaml GC10-DET_brightness_-50_detect_by_yolov8n_with_dropout(p=0.1)"
-"/Data4/student_zhihan_data/data/GC10-DET_brightness_-30/data.yaml GC10-DET_brightness_-30_detect_by_yolov8n_with_dropout(p=0.1)"
-"/Data4/student_zhihan_data/data/GC10-DET_brightness_-20/data.yaml GC10-DET_brightness_-20_detect_by_yolov8n_with_dropout(p=0.1)"
-"/Data4/student_zhihan_data/data/GC10-DET_brightness_-10/data.yaml GC10-DET_brightness_-10_detect_by_yolov8n_with_dropout(p=0.1)"
-"/Data4/student_zhihan_data/data/GC10-DET_brightness_10/data.yaml GC10-DET_brightness_10_detect_by_yolov8n_with_dropout(p=0.1)"
-"/Data4/student_zhihan_data/data/GC10-DET_brightness_20/data.yaml GC10-DET_brightness_20_detect_by_yolov8n_with_dropout(p=0.1)"
-"/Data4/student_zhihan_data/data/GC10-DET_brightness_30/data.yaml GC10-DET_brightness_30_detect_by_yolov8n_with_dropout(p=0.1)"
-"/Data4/student_zhihan_data/data/GC10-DET_brightness_50/data.yaml GC10-DET_brightness_50_detect_by_yolov8n_with_dropout(p=0.1)"
-"/Data4/student_zhihan_data/data/GC10-DET_brightness_60/data.yaml GC10-DET_brightness_60_detect_by_yolov8n_with_dropout(p=0.1)"
-"/Data4/student_zhihan_data/data/GC10-DET_brightness_70/data.yaml GC10-DET_brightness_70_detect_by_yolov8n_with_dropout(p=0.1)"
-"/Data4/student_zhihan_data/data/GC10-DET_brightness_90/data.yaml GC10-DET_brightness_90_detect_by_yolov8n_with_dropout(p=0.1)"
+"/Data4/student_zhihan_data/data/GC10-DET_MedianBlur_71/data.yaml GC10-DET_MedianBlur_71_detect_by_yolov8n"
+"/Data4/student_zhihan_data/data/GC10-DET_MedianBlur_57/data.yaml GC10-DET_MedianBlur_57_detect_by_yolov8n"
+"/Data4/student_zhihan_data/data/GC10-DET_MedianBlur_43/data.yaml GC10-DET_MedianBlur_43_detect_by_yolov8n"
+"/Data4/student_zhihan_data/data/GC10-DET_MedianBlur_29/data.yaml GC10-DET_MedianBlur_29_detect_by_yolov8n"
+"/Data4/student_zhihan_data/data/GC10-DET_MedianBlur_15/data.yaml GC10-DET_MedianBlur_15_detect_by_yolov8n"
 )
 
 # 控制同时运行的任务数量
-MAX_JOBS=4
+MAX_JOBS=2
 current_jobs=0
 
 # 遍历任务并运行它们，同时保持最多 MAX_JOBS 个任务运行
