@@ -53,8 +53,10 @@ def cluster_bounding_boxes(bounding_boxes:np.ndarray, n_clusters=3, confs=None, 
     if len(selected_data) < n_clusters:
         return selected_data, None, None, None
 
+    if n_clusters == 0:
+        return selected_data, None, None, None
     
-    kmeans = KMeans(n_clusters=n_clusters, random_state=0, max_iter=1000).fit(selected_data)
+    kmeans = KMeans(n_clusters=n_clusters, random_state=0, max_iter=1000, n_init="auto").fit(selected_data)
     labels = kmeans.labels_
 
     variances = []
@@ -69,7 +71,9 @@ def cluster_bounding_boxes(bounding_boxes:np.ndarray, n_clusters=3, confs=None, 
   
     return selected_data, labels, variances, weighted_variance_sum
 
-def uncertainty(dir, times, model):
+def uncertainty(dir, times, model, df):
+    
+    df = pd.DataFrame(columns=['dataset', 'img_name', 'objectness_uncertainty', 'weighted_variance_sum', 'weighted_entropy'])
     images = os.listdir(os.path.join(dir, "test", "images"))
     labels = os.listdir(os.path.join(dir, "test", "labels"))
     
@@ -80,7 +84,8 @@ def uncertainty(dir, times, model):
         img_path = os.path.join(dir, "test", "images", img)
         label_path = os.path.join(dir, "test", "labels", label)
     
-        results = model([img_path for i in range(times)], verbose=False)
+        results = model([img_path for i in range(times // 2)], verbose=False, device="0,1,2,3")
+        results.extend(model([img_path for i in range(times - times // 2)], verbose=False, device="0,1,2,3"))
         
         boundingboxes = []
         boxes = []
@@ -117,6 +122,8 @@ def uncertainty(dir, times, model):
 
         weighted_entropy = np.mean(np.array(entropy_cluster) * np.bincount(labels, minlength=cluster_num).reshape(-1, 1) / np.sum(np.bincount(labels)))
         
+            # df = df.append({'dataset': dir, 'img_name': img, 'objectness_uncertainty': objectness_uncertainty, 'weighted_variance_sum': weighted_variance_sum, 'weighted_entropy': weighted_entropy}, ignore_index=True)
+        df.loc[len(df)] = [dir, img, objectness_uncertainty, weighted_variance_sum, weighted_entropy]
         objectness_sum.append(objectness_uncertainty)
         weighted_variance_total.append(weighted_variance_sum)
         weighted_entropy_total.append(weighted_entropy)
@@ -125,6 +132,7 @@ def uncertainty(dir, times, model):
 
     print(f'{dir}: objectness_uncertainty: {np.mean(objectness_sum)}, weighted_variance_sum: {np.mean(weighted_variance_total)}, weighted_entropy: {np.mean(weighted_entropy_total)}')
 
+    return objectness_sum, weighted_variance_total, weighted_entropy_total, df
 def uncertainty_one(times, model):
     dir = ['GC10-DET_brightness_'+str(i) for i in [-50, -30, 30, 50]]
     dir.append('GC10-DET')
@@ -176,15 +184,31 @@ def uncertainty_one(times, model):
         break
 
 if __name__ == '__main__':
+    import pandas as pd
     
     # model = YOLO('yolov8-dropblock.yaml').load('/Data4/student_zhihan_data/source_code/yolo/ultralytics/runs/detect/GC10-DET_brightness_0_detect_by_yolov8n_with_dropblock(p=0.05 s=5)2/weights/best.pt')
     model = YOLO('/Data4/student_zhihan_data/source_code/yolo/ultralytics/runs/detect/GC10-DET_brightness_0 detect by yolov8n with dropout(p=0.1)/weights/best.pt')
     # dir = '/Data4/student_zhihan_data/data/GC10-DET'
     # uncertainty_one(400, model)
     
-    dir = ['GC10-DET_brightness_'+str(i) for i in [-15, 60, 70]]
+    # dir = ['GC10-DET_MedianBlur_'+str(i) for i in [15, 29, 43, 57, 71]]
+    # dir.extend(['GC10-DET_BilateralBlur_'+str(i) for i in [60, 120, 180, 240, 300]])
+    # dir = ['GC10-DET_brightness_'+str(i) for i in [60,70,90,110]]
+    dir = []
+    dir.extend(['/Data4/student_zhihan_data/data/GC10-DET_Transform_Scale_0.05:0.1', '/Data4/student_zhihan_data/data/GC10-DET_Transform_Scale_0.1:0.15000000000000002', '/Data4/student_zhihan_data/data/GC10-DET_Transform_Scale_0.15000000000000002:0.2', '/Data4/student_zhihan_data/data/GC10-DET_Transform_Scale_0.2:0.25', '/Data4/student_zhihan_data/data/GC10-DET_Transform_Scale_0.25:0.3'])
+    dir.append('GC10-DET')
+    
     # dir.append('GC10-DET')
     
     dir = [os.path.join('/Data4/student_zhihan_data/data',i) for i in dir]
+    
+    df = pd.DataFrame(columns=['dataset', 'objectness_uncertainty', 'weighted_variance_sum', 'weighted_entropy'])
     for i in dir:
-        uncertainty(i, 400, model)
+        df_img = pd.DataFrame(columns=['dataset', 'img_name', 'objectness_uncertainty', 'weighted_variance_sum', 'weighted_entropy'])
+        df_img.to_csv(f'{i}.csv', mode='a', header=True, index=False)
+        a, b, c, df_img = uncertainty(i, 400, model, df_img)
+        df.loc[len(df)] = [i, a, b, c]
+        df_img.to_csv(f'{i}.csv', mode='a', header=False, index=False)
+
+    df.to_csv('Uncertainty.csv', mode='a', header=True, index=False)
+    

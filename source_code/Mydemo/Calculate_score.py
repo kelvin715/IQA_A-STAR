@@ -178,10 +178,16 @@ import pandas
 columns = ['dataset', 'score', 'visibility', 'exposure', 'distribution_visibility']
 dir = ['test']
 for j in dir:
-    for i in [15, 29, 43, 57, 71]:
+    # for i in [60,120,180,240,300]:
+    #     # save to csv
+    #     score, vis, expo, distr = quality_prediction_of_dataset(f'/Data4/student_zhihan_data/data/GC10-DET_BilateralBlur_{i}/{j}')
+    #     print(['GC10-DET_BilateralBlur_'+str(i), score, vis, expo, distr])
+    #     df = pandas.DataFrame([['GC10-DET_BilateralBlur_'+str(i), score, vis, expo, distr]], columns=columns)
+    #     df.to_csv(j+'demo.csv', mode='a', header=False, index=False)
+ 
+    for i in ['0.0:0.05', '0.05:0.1', '0.1:0.15000000000000002', '0.15000000000000002:0.2', '0.2:0.25', '0.25:0.3']:   
         # save to csv
-        score, vis, expo, distr = quality_prediction_of_dataset(f'/Data4/student_zhihan_data/data/GC10-DET_MedianBlur_{i}/{j}')
-        print(['GC10-DET_MedianBlur_'+str(i), score, vis, expo, distr])
-        df = pandas.DataFrame([['GC10-DET_MedianBlur_'+str(i), score, vis, expo, distr]], columns=columns)
+        score, vis, expo, distr = quality_prediction_of_dataset(f'/Data4/student_zhihan_data/data/GC10-DET_Transform_Scale_{i}/{j}')
+        print(['GC10-DET_BilateralBlur_'+str(i), score, vis, expo, distr])
+        df = pandas.DataFrame([['GGC10-DET_Transform_Scale_'+str(i), score, vis, expo, distr]], columns=columns)
         df.to_csv(j+'demo.csv', mode='a', header=False, index=False)
-    
