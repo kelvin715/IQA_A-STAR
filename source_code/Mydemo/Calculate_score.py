@@ -22,8 +22,13 @@ def cal_visibility_based_on_chan_vese(I, label):
     """
     image_width, image_height = I.shape
     
+    if len(label) == 0:
+        return None
+    
     x, y, width, height = label[0], label[1], label[2], label[3]
     target = I[max(0, int((y - height / 2) * image_width)) : min(image_height, int((y + height / 2) * image_width)), max(0, int((x - width / 2) * image_height)) : min(image_width, int((x + width / 2) * image_height))]
+    if np.size(target) == 0:
+        return None
     cv = chan_vese(target, mu=0.05, lambda1=1, lambda2=1, tol=1e-3, max_num_iter=200,
                 dt=0.5, init_level_set="checkerboard", extended_output=True)
 
@@ -153,10 +158,12 @@ def quality_prediction_of_dataset(path):
         if len(labels.shape) == 2:
             for label in labels:        
                 visibility = cal_visibility_based_on_chan_vese(img, label[1:])
-                visibility_record.append(visibility)
+                if visibility is not None:
+                    visibility_record.append(visibility)
         else:
             visibility = cal_visibility_based_on_chan_vese(img, labels[1:])
-            visibility_record.append(visibility)
+            if visibility is not None:
+                visibility_record.append(visibility)
                     
         # exposure = cal_exposure(img)
         exposure = cal_overexposure_and_overdarkness(img)
@@ -185,9 +192,13 @@ for j in dir:
     #     df = pandas.DataFrame([['GC10-DET_BilateralBlur_'+str(i), score, vis, expo, distr]], columns=columns)
     #     df.to_csv(j+'demo.csv', mode='a', header=False, index=False)
  
-    for i in ['0.0:0.05', '0.05:0.1', '0.1:0.15000000000000002', '0.15000000000000002:0.2', '0.2:0.25', '0.25:0.3']:   
+    # for i in ['0.05:0.1', '0.1:0.15000000000000002', '0.15000000000000002:0.2', '0.2:0.25', '0.25:0.3']: 
+    for i in ["0.5", "1.5", "2.0", "2.5", "3"]:  
         # save to csv
-        score, vis, expo, distr = quality_prediction_of_dataset(f'/Data4/student_zhihan_data/data/GC10-DET_Transform_Scale_{i}/{j}')
-        print(['GC10-DET_BilateralBlur_'+str(i), score, vis, expo, distr])
-        df = pandas.DataFrame([['GGC10-DET_Transform_Scale_'+str(i), score, vis, expo, distr]], columns=columns)
+        score, vis, expo, distr = quality_prediction_of_dataset(f'/Data4/student_zhihan_data/data/GC10-DET_Sharpening_{i}/{j}')
+        print(['GC10-DET_Sharpening_'+str(i), score, vis, expo, distr])
+        df = pandas.DataFrame([['GGC10-DET_Sharpening_'+str(i), score, vis, expo, distr]], columns=columns)
         df.to_csv(j+'demo.csv', mode='a', header=False, index=False)
+        
+    
+    

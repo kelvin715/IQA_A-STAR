@@ -110,6 +110,9 @@ def uncertainty(dir, times, model, df):
             continue
         
         objectness_uncertainty = np.var(conf[conf > 0.5])
+        # calculate entropy
+        objectness_entropy = np.apply_along_axis(lambda x: -1 * np.sum(x * np.log2(x)), 1, cls_conf[conf > 0.5])
+            
         
         entropy_cluster = []
         for i in range(cluster_num):
@@ -130,9 +133,9 @@ def uncertainty(dir, times, model, df):
         
         # print(f'objectness_uncertainty: {objectness_uncertainty}, weighted_variance_sum: {weighted_variance_sum}, weighted_entropy: {weighted_entropy}')
 
-    print(f'{dir}: objectness_uncertainty: {np.mean(objectness_sum)}, weighted_variance_sum: {np.mean(weighted_variance_total)}, weighted_entropy: {np.mean(weighted_entropy_total)}')
+    print(f'{dir}: objectness_uncertainty: {np.mean(objectness_sum)}, weighted_variance_sum: {np.mean(weighted_variance_total)}, weighted_entropy: {np.mean(weighted_entropy_total)}, objectness_entropy: {np.mean(objectness_entropy)}')
 
-    return objectness_sum, weighted_variance_total, weighted_entropy_total, df
+    return objectness_sum, objectness_entropy, weighted_variance_total, weighted_entropy_total, df
 def uncertainty_one(times, model):
     dir = ['GC10-DET_brightness_'+str(i) for i in [-50, -30, 30, 50]]
     dir.append('GC10-DET')
@@ -170,7 +173,7 @@ def uncertainty_one(times, model):
             selected_data, labels, variances, weighted_variance_sum = cluster_bounding_boxes(boundingboxes, n_clusters=cluster_num, confs=np.array(conf), threshold=0.5)
             
             objectness_uncertainty = np.var(conf[conf > 0.5])
-            
+
             entropy_cluster = []
             for i in range(cluster_num):
                 cluster = cls_conf[conf > 0.5][labels == i]
@@ -191,24 +194,40 @@ if __name__ == '__main__':
     # dir = '/Data4/student_zhihan_data/data/GC10-DET'
     # uncertainty_one(400, model)
     
-    # dir = ['GC10-DET_MedianBlur_'+str(i) for i in [15, 29, 43, 57, 71]]
-    # dir.extend(['GC10-DET_BilateralBlur_'+str(i) for i in [60, 120, 180, 240, 300]])
-    # dir = ['GC10-DET_brightness_'+str(i) for i in [60,70,90,110]]
-    dir = []
-    dir.extend(['/Data4/student_zhihan_data/data/GC10-DET_Transform_Scale_0.05:0.1', '/Data4/student_zhihan_data/data/GC10-DET_Transform_Scale_0.1:0.15000000000000002', '/Data4/student_zhihan_data/data/GC10-DET_Transform_Scale_0.15000000000000002:0.2', '/Data4/student_zhihan_data/data/GC10-DET_Transform_Scale_0.2:0.25', '/Data4/student_zhihan_data/data/GC10-DET_Transform_Scale_0.25:0.3'])
-    dir.append('GC10-DET')
+    dir = ['GC10-DET']
+    dir.extend(['GC10-DET_MedianBlur_'+str(i) for i in [15, 29, 43, 57, 71]])
+    dir.extend(['GC10-DET_BilateralBlur_'+str(i) for i in [60, 120, 180, 240, 300]])
+    dir.extend(['GC10-DET_Sharpening_0.5',
+                'GC10-DET_Sharpening_1.5',
+                'GC10-DET_Sharpening_2.0',
+                'GC10-DET_Sharpening_2.5',
+                'GC10-DET_Sharpening_3'])
+    dir.extend(['GC10-DET_Transform_Scale_'+i for i in ["0.0:0.05", "0.05:0.1", "0.1:0.15", "0.15:0.2", "0.2:0.25", "0.25:0.3"]])
+    dir.extend(['GC10-DET_brightness_'+str(i) for i in [-150, -100, -50, -30, -20, -15, -10, 10, 20, 30, 50, 60, 70, 90]])
+
+    
+    # model_paths = []
+    # model_paths.extend(['/Data4/student_zhihan_data/source_code/yolo/ultralytics/runs/detect/GC10-DET_Sharpening_0.5_detect_by_yolov8n_with_dropblock(p=0.05/weights/best.pt',
+    #                     '/Data4/student_zhihan_data/source_code/yolo/ultralytics/runs/detect/GC10-DET_Sharpening_1.5_detect_by_yolov8n_with_dropblock(p=0.05/weights/best.pt',
+    #                     '/Data4/student_zhihan_data/source_code/yolo/ultralytics/runs/detect/GC10-DET_Sharpening_2.0_detect_by_yolov8n_with_dropblock(p=0.05/weights/best.pt',
+    #                     '/Data4/student_zhihan_data/source_code/yolo/ultralytics/runs/detect/GC10-DET_Sharpening_2.5_detect_by_yolov8n_with_dropblock(p=0.05/weights/best.pt',
+    #                     '/Data4/student_zhihan_data/source_code/yolo/ultralytics/runs/detect/GC10-DET_Sharpening_3_detect_by_yolov8n_with_dropblock(p=0.05/weights/best.pt'])
+    
+    # dir.extend(['/Data4/student_zhihan_data/data/GC10-DET_Transform_Scale_0.05:0.1', '/Data4/student_zhihan_data/data/GC10-DET_Transform_Scale_0.1:0.15000000000000002', '/Data4/student_zhihan_data/data/GC10-DET_Transform_Scale_0.15000000000000002:0.2', '/Data4/student_zhihan_data/data/GC10-DET_Transform_Scale_0.2:0.25', '/Data4/student_zhihan_data/data/GC10-DET_Transform_Scale_0.25:0.3'])
+    # dir.append('GC10-DET')
     
     # dir.append('GC10-DET')
     
-    dir = [os.path.join('/Data4/student_zhihan_data/data',i) for i in dir]
+    dirs = [os.path.join('/Data4/student_zhihan_data/data',i) for i in dir]
     
-    df = pd.DataFrame(columns=['dataset', 'objectness_uncertainty', 'weighted_variance_sum', 'weighted_entropy'])
-    for i in dir:
-        df_img = pd.DataFrame(columns=['dataset', 'img_name', 'objectness_uncertainty', 'weighted_variance_sum', 'weighted_entropy'])
-        df_img.to_csv(f'{i}.csv', mode='a', header=True, index=False)
-        a, b, c, df_img = uncertainty(i, 400, model, df_img)
-        df.loc[len(df)] = [i, a, b, c]
-        df_img.to_csv(f'{i}.csv', mode='a', header=False, index=False)
+    df = pd.DataFrame(columns=['dataset', 'objectness_uncertainty', 'objectness_entropy', 'weighted_variance_sum', 'weighted_entropy'])
+    for idx, i in enumerate(dir):
+        record = []
+        df_img = pd.DataFrame(columns=['dataset', 'img_name', 'objectness_uncertainty', 'objectness_entropy', 'weighted_variance_sum', 'weighted_entropy'])
+        df_img.to_csv(f'{dir[idx]}.csv', mode='a', header=True, index=False)
+        a, b, c, d, df_img = uncertainty(dirs[idx], 400, model, df_img)
+        df.loc[len(df)] = [i, np.mean(a), np.mean(b), np.mean(c), np.mean(d)]
+        df_img.to_csv(f'{dir[idx]}.csv', mode='a', header=False, index=False)
+        df.to_csv('Uncertainty.csv', mode='a', header=True, index=False)
 
-    df.to_csv('Uncertainty.csv', mode='a', header=True, index=False)
     

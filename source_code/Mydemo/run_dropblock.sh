@@ -12,10 +12,7 @@ run_yolo() {
 
 # 创建一个数组，包含所有的数据文件路径和名称
 declare -a tasks=(
-"/Data4/student_zhihan_data/data/GC10-DET_MedianBlur_71/data.yaml GC10-DET_MedianBlur_71_detect_by_yolov8n_with_dropblock(p=0.05 s=5)"
-"/Data4/student_zhihan_data/data/GC10-DET_MedianBlur_57/data.yaml GC10-DET_MedianBlur_57_detect_by_yolov8n_with_dropblock(p=0.05 s=5)"
-"/Data4/student_zhihan_data/data/GC10-DET_MedianBlur_29/data.yaml GC10-DET_MedianBlur_29_detect_by_yolov8n_with_dropblock(p=0.05 s=5)"
-"/Data4/student_zhihan_data/data/GC10-DET_MedianBlur_15/data.yaml GC10-DET_MedianBlur_15_detect_by_yolov8n_with_dropblock(p=0.05 s=5)"
+"/Data4/student_zhihan_data/data/GC10-DET_MedianBlur_43/data.yaml GC10-DET_MedianBlur_43_detect_by_yolov8n_with_dropblock(p=0.05 s=5)"
 )
 
 # 控制同时运行的任务数量
