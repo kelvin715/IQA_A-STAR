@@ -179,9 +179,70 @@ def quality_prediction_of_dataset(path):
     return score, visibility, exposure, distribution_visibility
 
 
+def quality_prediction_of_dataset_save_csv(path, df):
+    """quality prediction of dataset
+    Args:
+        path (_type_): path of dataset
+    """
+    visibility_record = []
+    exposure_record = []
+    for file in os.listdir(os.path.join(path, "images")):
+        prelix = file[:-4]
+        image_path = os.path.join(path, "images", file)
+        label_path = os.path.join(path, "labels", prelix+".txt")
+        
+        img = cv2.imread(image_path)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        labels = np.loadtxt(label_path)
+        
+        if len(labels.shape) == 2:
+            for label in labels:        
+                visibility = cal_visibility_based_on_chan_vese(img, label[1:])
+                if visibility is not None:
+                    visibility_record.append(visibility)
+        else:
+            visibility = cal_visibility_based_on_chan_vese(img, labels[1:])
+            if visibility is not None:
+                visibility_record.append(visibility)
+                    
+        # exposure = cal_exposure(img)
+        exposure = cal_overexposure_and_overdarkness(img)
+        exposure_record.append(exposure)
+        
+        # add to df
+        df.loc[len(df)] = [path, file, visibility, exposure]
+    
+    visibility = np.mean(np.array(visibility_record), axis=0)
+    exposure = np.mean(np.array(exposure_record), axis=0)
+    distribution_visibility = np.var(np.array(visibility_record / np.max(visibility_record)), axis=0)
+    
+    score = cal_comprehensive_score(exposure, distribution_visibility, visibility)
+    
 
-import pandas
+    return score, visibility, exposure, distribution_visibility, df
 
+
+
+import pandas as pd
+
+# columns = ['dataset', 'score', 'visibility', 'exposure', 'distribution_visibility']
+# dir = ['test']
+# for j in dir:
+#     # for i in [60,120,180,240,300]:
+#     #     # save to csv
+#     #     score, vis, expo, distr = quality_prediction_of_dataset(f'/Data4/student_zhihan_data/data/GC10-DET_BilateralBlur_{i}/{j}')
+#     #     print(['GC10-DET_BilateralBlur_'+str(i), score, vis, expo, distr])
+#     #     df = pandas.DataFrame([['GC10-DET_BilateralBlur_'+str(i), score, vis, expo, distr]], columns=columns)
+#     #     df.to_csv(j+'demo.csv', mode='a', header=False, index=False)
+ 
+#     # for i in ['0.05:0.1', '0.1:0.15000000000000002', '0.15000000000000002:0.2', '0.2:0.25', '0.25:0.3']: 
+#     for i in ["0.5", "1.5", "2.0", "2.5", "3"]:  
+#         # save to csv
+#         score, vis, expo, distr = quality_prediction_of_dataset(f'/Data4/student_zhihan_data/data/GC10-DET_Sharpening_{i}/{j}')
+#         print(['GC10-DET_Sharpening_'+str(i), score, vis, expo, distr])
+#         df = pandas.DataFrame([['GGC10-DET_Sharpening_'+str(i), score, vis, expo, distr]], columns=columns)
+#         df.to_csv(j+'demo.csv', mode='a', header=False, index=False)
+        
 columns = ['dataset', 'score', 'visibility', 'exposure', 'distribution_visibility']
 dir = ['test']
 for j in dir:
@@ -195,10 +256,44 @@ for j in dir:
     # for i in ['0.05:0.1', '0.1:0.15000000000000002', '0.15000000000000002:0.2', '0.2:0.25', '0.25:0.3']: 
     for i in ["0.5", "1.5", "2.0", "2.5", "3"]:  
         # save to csv
-        score, vis, expo, distr = quality_prediction_of_dataset(f'/Data4/student_zhihan_data/data/GC10-DET_Sharpening_{i}/{j}')
+        df_img = pd.DataFrame(columns=['dataset', 'img_name', 'visibility', 'exposure'])
+        score, vis, expo, distr, df_img = quality_prediction_of_dataset_save_csv(f'/Data4/student_zhihan_data/data/GC10-DET_Sharpening_{i}/{j}', df_img)
+        df_img.to_csv(f'/Data4/student_zhihan_data/source_code/IQA_A-STAR/source_code/Mydemo/Proposed_Score_Record/GC10-DET_Sharpening_{i}'+'.csv', mode='a', header=False, index=False)
         print(['GC10-DET_Sharpening_'+str(i), score, vis, expo, distr])
-        df = pandas.DataFrame([['GGC10-DET_Sharpening_'+str(i), score, vis, expo, distr]], columns=columns)
+        df = pd.DataFrame([['GGC10-DET_Sharpening_'+str(i), score, vis, expo, distr]], columns=columns)
         df.to_csv(j+'demo.csv', mode='a', header=False, index=False)
-        
     
+    for i in [15, 29, 43, 57, 71]:  
+        # save to csv
+        df_img = pd.DataFrame(columns=['dataset', 'img_name', 'visibility', 'exposure'])
+        score, vis, expo, distr, df_img = quality_prediction_of_dataset_save_csv(f'/Data4/student_zhihan_data/data/GC10-DET_MedianBlur_{i}/{j}', df_img)
+        df_img.to_csv(f'/Data4/student_zhihan_data/source_code/IQA_A-STAR/source_code/Mydemo/Proposed_Score_Record/GC10-DET_MedianBlur_{i}'+'.csv', mode='a', header=False, index=False)
+        print(['GC10-DET_MedianBlur_'+str(i), score, vis, expo, distr])
+        df = pd.DataFrame([['GGC10-DET_MedianBlur_'+str(i), score, vis, expo, distr]], columns=columns)
+        df.to_csv(j+'demo.csv', mode='a', header=False, index=False)   
     
+
+    for i in [60, 120, 180, 240, 300]:
+        # save to csv
+        df_img = pd.DataFrame(columns=['dataset', 'img_name', 'visibility', 'exposure'])
+        score, vis, expo, distr, df_img = quality_prediction_of_dataset_save_csv(f'/Data4/student_zhihan_data/data/GC10-DET_BilateralBlur_{i}/{j}', df_img)
+        df_img.to_csv(f'/Data4/student_zhihan_data/source_code/IQA_A-STAR/source_code/Mydemo/Proposed_Score_Record/GC10-DET_BilateralBlur_{i}'+'.csv', mode='a', header=False, index=False)
+        print(['GC10-DET_BilateralBlur_'+str(i), score, vis, expo, distr])
+        df = pd.DataFrame([['GGC10-DET_BilateralBlur_'+str(i), score, vis, expo, distr]], columns=columns)
+        df.to_csv(j+'demo.csv', mode='a', header=False, index=False)
+    
+    for i in [-150, -100, -50, -30, -20, -15, -10, 10, 20, 30, 50, 60, 70, 90, 110]:
+        # save to csv
+        df_img = pd.DataFrame(columns=['dataset', 'img_name', 'visibility', 'exposure'])
+        score, vis, expo, distr, df_img = quality_prediction_of_dataset_save_csv(f'/Data4/student_zhihan_data/data/GC10-DET_brightness_{i}/{j}', df_img)
+        df_img.to_csv(f'/Data4/student_zhihan_data/source_code/IQA_A-STAR/source_code/Mydemo/Proposed_Score_Record/GC10-DET_brightness_{i}'+'.csv', mode='a', header=False, index=False)
+        print(['GC10-DET_brightness_'+str(i), score, vis, expo, distr])
+        df = pd.DataFrame([['GGC10-DET_brightness_'+str(i), score, vis, expo, distr]], columns=columns)
+        df.to_csv(j+'demo.csv', mode='a', header=False, index=False)
+    
+    df_img = pd.DataFrame(columns=['dataset', 'img_name', 'visibility', 'exposure'])
+    score, vis, expo, distr, df_img = quality_prediction_of_dataset_save_csv(f'/Data4/student_zhihan_data/data/GC10-DET/test', df_img)
+    df_img.to_csv(f'/Data4/student_zhihan_data/source_code/IQA_A-STAR/source_code/Mydemo/Proposed_Score_Record/GC10-DET'+'.csv', mode='a', header=False, index=False)
+    print(['GC10-DET'+str(i), score, vis, expo, distr])
+    df = pd.DataFrame([['GGC10-DET'+str(i), score, vis, expo, distr]], columns=columns)
+    df.to_csv(j+'demo.csv', mode='a', header=False, index=False) 
