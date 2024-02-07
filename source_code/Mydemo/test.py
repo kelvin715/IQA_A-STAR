@@ -194,17 +194,18 @@ if __name__ == '__main__':
     # dir = '/Data4/student_zhihan_data/data/GC10-DET'
     # uncertainty_one(400, model)
     
-    dir = ['GC10-DET']
-    dir.extend(['GC10-DET_MedianBlur_'+str(i) for i in [15, 29, 43, 57, 71]])
-    dir.extend(['GC10-DET_BilateralBlur_'+str(i) for i in [60, 120, 180, 240, 300]])
-    dir.extend(['GC10-DET_Sharpening_0.5',
-                'GC10-DET_Sharpening_1.5',
-                'GC10-DET_Sharpening_2.0',
-                'GC10-DET_Sharpening_2.5',
-                'GC10-DET_Sharpening_3'])
-    dir.extend(['GC10-DET_Transform_Scale_'+i for i in ["0.0:0.05", "0.05:0.1", "0.1:0.15", "0.15:0.2", "0.2:0.25", "0.25:0.3"]])
-    dir.extend(['GC10-DET_brightness_'+str(i) for i in [-150, -100, -50, -30, -20, -15, -10, 10, 20, 30, 50, 60, 70, 90]])
+    # dir = ['GC10-DET']
+    # dir.extend(['GC10-DET_MedianBlur_'+str(i) for i in [15, 29, 43, 57, 71]])
+    # dir.extend(['GC10-DET_BilateralBlur_'+str(i) for i in [60, 120, 180, 240, 300]])
+    # dir.extend(['GC10-DET_Sharpening_0.5',
+    #             'GC10-DET_Sharpening_1.5',
+    #             'GC10-DET_Sharpening_2.0',
+    #             'GC10-DET_Sharpening_2.5',
+    #             'GC10-DET_Sharpening_3'])
+    # dir.extend(['GC10-DET_Transform_Scale_'+i for i in ["0.0:0.05", "0.05:0.1", "0.1:0.15", "0.15:0.2", "0.2:0.25", "0.25:0.3"]])
+    # dir.extend(['GC10-DET_brightness_'+str(i) for i in [-150, -100, -50, -30, -20, -15, -10, 10, 20, 30, 50, 60, 70, 90]])
 
+    dir = [f'GC10-DET_Sharpen_{i}' for i in [5, 10, 15, 20, 25]]
     
     # model_paths = []
     # model_paths.extend(['/Data4/student_zhihan_data/source_code/yolo/ultralytics/runs/detect/GC10-DET_Sharpening_0.5_detect_by_yolov8n_with_dropblock(p=0.05/weights/best.pt',
