@@ -126,7 +126,7 @@ def uncertainty(dir, times, model, df):
         weighted_entropy = np.mean(np.array(entropy_cluster) * np.bincount(labels, minlength=cluster_num).reshape(-1, 1) / np.sum(np.bincount(labels)))
         
             # df = df.append({'dataset': dir, 'img_name': img, 'objectness_uncertainty': objectness_uncertainty, 'weighted_variance_sum': weighted_variance_sum, 'weighted_entropy': weighted_entropy}, ignore_index=True)
-        df.loc[len(df)] = [dir, img, objectness_uncertainty, weighted_variance_sum, weighted_entropy]
+        df.loc[len(df)] = [dir, img, objectness_uncertainty, objectness_entropy, weighted_variance_sum, weighted_entropy]
         objectness_sum.append(objectness_uncertainty)
         weighted_variance_total.append(weighted_variance_sum)
         weighted_entropy_total.append(weighted_entropy)

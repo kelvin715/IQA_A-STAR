@@ -291,14 +291,23 @@ for j in dir:
     #     df = pd.DataFrame([['GGC10-DET_brightness_'+str(i), score, vis, expo, distr]], columns=columns)
     #     df.to_csv(j+'demo.csv', mode='a', header=False, index=False)
         
-    for i in [5, 10, 15, 20, 25]:
-        # save to csv
+    # for i in [5, 10, 15, 20, 25]:
+    #     # save to csv
+    #     df_img = pd.DataFrame(columns=['dataset', 'img_name', 'visibility', 'exposure'])
+    #     score, vis, expo, distr, df_img = quality_prediction_of_dataset_save_csv(f'/Data4/student_zhihan_data/data/GC10-DET_Sharpen_{i}/{j}', df_img)
+    #     df_img.to_csv(f'/Data4/student_zhihan_data/source_code/IQA_A-STAR/source_code/Mydemo/Proposed_Score_Record/GC10-DET_Sharpen_{i}'+'.csv', mode='a', header=False, index=False)
+    #     print(['GC10-DET_Sharpen_'+str(i), score, vis, expo, distr])
+    #     df = pd.DataFrame([['GGC10-DET_Sharpen_'+str(i), score, vis, expo, distr]], columns=columns)
+    #     df.to_csv(j+'demo.csv', mode='a', header=False, index=False)
+    
+    for i in ['0.0:0.05', '0.1:0.15', '0.2:0.25', '0.05:0.1', '0.25:0.3', '0.15:0.2']:
         df_img = pd.DataFrame(columns=['dataset', 'img_name', 'visibility', 'exposure'])
-        score, vis, expo, distr, df_img = quality_prediction_of_dataset_save_csv(f'/Data4/student_zhihan_data/data/GC10-DET_Sharpen_{i}/{j}', df_img)
-        df_img.to_csv(f'/Data4/student_zhihan_data/source_code/IQA_A-STAR/source_code/Mydemo/Proposed_Score_Record/GC10-DET_Sharpen_{i}'+'.csv', mode='a', header=False, index=False)
-        print(['GC10-DET_Sharpen_'+str(i), score, vis, expo, distr])
-        df = pd.DataFrame([['GGC10-DET_Sharpen_'+str(i), score, vis, expo, distr]], columns=columns)
+        score, vis, expo, distr, df_img = quality_prediction_of_dataset_save_csv(f'/Data4/student_zhihan_data/data/GC10-DET_Transform_Scale_{i}/{j}', df_img)
+        df_img.to_csv(f'/Data4/student_zhihan_data/source_code/IQA_A-STAR/source_code/Mydemo/Proposed_Score_Record/GC10-DET_Transform_Scale_{i}'+'.csv', mode='a', header=False, index=False)
+        print(['GC10-DET_Transform_Scale_'+str(i), score, vis, expo, distr])
+        df = pd.DataFrame([['GGC10-DET_Transform_Scale_'+str(i), score, vis, expo, distr]], columns=columns)
         df.to_csv(j+'demo.csv', mode='a', header=False, index=False)
+        
     
     # df_img = pd.DataFrame(columns=['dataset', 'img_name', 'visibility', 'exposure'])
     # score, vis, expo, distr, df_img = quality_prediction_of_dataset_save_csv(f'/Data4/student_zhihan_data/data/GC10-DET/test', df_img)
