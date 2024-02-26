@@ -6,7 +6,7 @@ import sys
 import os
 def create_dataset_with_adjust_brightness(brightness=0, base="NEU-DET"):
     # mkdir
-    name = f"{base}_BilateralBlur_{brightness}"
+    name = f"{base}_GaussianBlur_{brightness}"
     path = os.path.join('/Data4/student_zhihan_data/data', name)
     if not os.path.exists(path):
         os.mkdir(path)
@@ -26,8 +26,8 @@ def create_dataset_with_adjust_brightness(brightness=0, base="NEU-DET"):
         for img in os.listdir(os.path.join(path, dir, "images")):
             img_path = os.path.join(path, dir, "images", img)
             img = cv2.imread(img_path)
-            img = cv2.bilateralFilter(img, brightness, brightness, brightness) 
+            img = cv2.GaussianBlur(img, ksize=(brightness, brightness), sigmaX=0, sigmaY=0) 
             cv2.imwrite(img_path, img)
             
-for i in range(4,12,2):
-    create_dataset_with_adjust_brightness(brightness=i * 30, base="GC10-DET")
+for i in [13, 15, 17]:
+    create_dataset_with_adjust_brightness(brightness=i , base="GC10-DET")
